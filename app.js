@@ -6,7 +6,8 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     GoogleAuthProvider,
-    signInWithPopup
+    signInWithPopup,
+    onAuthStateChanged
 }
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
@@ -92,8 +93,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = document.getElementById("loginPassword").value;
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
-            alert("Login successful!");
+           await signInWithEmailAndPassword(auth, email, password);
+
+closeModal(); // auto close form
+
+document.getElementById("loginOption").style.display = "none";
+
+alert("Login successful!");
 
         } catch (error) {
             console.log(error);
@@ -118,8 +124,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 uid: user.uid
             });
 
-            alert("Google Sign-In Successful!");
+            closeModal(); // auto close modal
 
+document.getElementById("loginOption").style.display = "none";
+
+alert("Google Sign-In Successful!");
         } catch (error) {
             console.log(error);
             alert(error.message);
@@ -173,3 +182,32 @@ window.onclick = function(e){
         closeModal();
     }
 }
+// ================= AUTH STATE =================
+
+onAuthStateChanged(auth, (user) => {
+
+    const loginOption = document.getElementById("loginOption");
+
+    if(user){
+
+        console.log("User already logged in");
+
+        // hide login option/button
+        if(loginOption){
+            loginOption.style.display = "none";
+        }
+
+        // auto close modals
+        if(loginModal) loginModal.style.display = "none";
+        if(registerModal) registerModal.style.display = "none";
+
+    } else {
+
+        console.log("No user logged in");
+
+        // show login button again
+        if(loginOption){
+            loginOption.style.display = "block";
+        }
+    }
+});
